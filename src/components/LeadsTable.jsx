@@ -12,6 +12,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [order, setOrder] = useState("desc");
   const [statusFilter, setStatusFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [searchName, setSearchName] = useState("");
 
@@ -24,6 +25,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
     // Build filters dynamically
     const filters = {};
     if (statusFilter) filters.status = statusFilter;
+	if (priorityFilter) filters.priority = priorityFilter;
     if (searchName.trim() !== "") filters.name = searchName;
 
     console.log("Fetching leads with:", { sortBy, order, filters });
@@ -35,7 +37,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
       })
       .catch(() => setErrorMessage("Failed to load leads. Please try again later."))
       .finally(() => setIsLoading(false));
-  }, [reloadTable, sortBy, order, statusFilter, searchName]);
+  }, [reloadTable, sortBy, order, statusFilter, priorityFilter, searchName]);
 
   /**
    * Debounced function to set `searchName` state after user stops typing.
@@ -86,6 +88,8 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
             <option value="name">Name</option>
             <option value="email">Email</option>
             <option value="status">Status</option>
+			<option value="priority">Priority</option>
+
           </select>
         </label>
 
@@ -104,7 +108,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
 
         {/* Status Filter Dropdown */}
         <label className="block">
-          Filter by Status:
+          Status:
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -117,8 +121,26 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
             <option value="Closed">Closed</option>
           </select>
         </label>
+		{/* Priority Filter Dropdown */}
+		<label className="block">
+          Priority:
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="ml-2 border rounded px-2 py-1"
+          >
+            <option value="">All</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            
+          </select>
+        </label>
       </div>
-
+		
+		
+		
+		
       {/* Error message */}
       {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
 
@@ -131,6 +153,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
             <th className="border border-gray-300 px-4 py-2">Email</th>
             <th className="border border-gray-300 px-4 py-2">Phone</th>
             <th className="border border-gray-300 px-4 py-2">Status</th>
+			<th className="border border-gray-300 px-4 py-2">Priority</th>
             <th className="border border-gray-300 px-4 py-2">Notes</th>
             <th className="border border-gray-300 px-4 py-2">Date</th>
             <th className="border border-gray-300 px-4 py-2">Actions</th>
@@ -153,6 +176,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
                   <td className="border border-gray-300 px-4 py-2">{lead.email}</td>
                   <td className="border border-gray-300 px-4 py-2">{lead.phone}</td>
                   <td className="border border-gray-300 px-4 py-2">{lead.status}</td>
+				  <td className="border border-gray-300 px-4 py-2">{lead.priority}</td>
                   <td className="border border-gray-300 px-4 py-2">{lead.notes || "—"}</td>
                   <td className="border border-gray-300 px-4 py-2">
                     {lead.createdAt ? format(new Date(lead.createdAt), "dd.MM.yyyy") : "—"}

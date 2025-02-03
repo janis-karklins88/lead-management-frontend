@@ -2,47 +2,49 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8080/api";
 
-// ✅ Helper function to get token from local storage
+//auto attach token to request
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("auth_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+//  Helper function to get token from local storage
 const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("auth_token");
+  if (token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 
-
+//get leads
 export const getLeads = (sortBy = "createdAt", order = "desc", filters = {}) => {
   const params = new URLSearchParams();
   params.append("sortBy", sortBy);
   params.append("order", order);
 
-  // Add filters dynamically
   Object.entries(filters).forEach(([key, value]) => {
-    if (value) params.append(key, value); // Only add non-empty filters
+    if (value) params.append(key, value);
   });
 
-  console.log("Sending API request with params:", params.toString()); // 🔍 Debugging Log
-
-  return axios.get(`http://localhost:8080/api/leads/leads?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  });
+  return axios.get(`${API_URL}/leads/leads?${params.toString()}`);
 };
 
-
-// ✅ Create lead (now includes JWT token)
+//create leads
 export const createLead = (leadData) => {
-  return axios.post(`${API_URL}/leads`, leadData, { headers: getAuthHeader() });
+  return axios.post(`${API_URL}/leads`, leadData);
 };
 
-// ✅ Update lead (now includes JWT token)
+//update leads
 export const updateLead = (leadData) => {
-  console.log("Updating lead:", leadData); // Debugging log
-  return axios.put(`http://localhost:8080/api/leads`, leadData, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  });
+  return axios.put(`${API_URL}/leads`, leadData);
 };
 
-
-// ✅ Delete lead (now includes JWT token)
+//delete leads
 export const deleteLead = (id) => {
-  return axios.delete(`${API_URL}/leads/${id}`, { headers: getAuthHeader() });
+  return axios.delete(`${API_URL}/leads/${id}`);
 };

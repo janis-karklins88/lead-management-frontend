@@ -23,6 +23,7 @@ const LeadForm = ({ lead, onSuccess, onCancel }) => {
     email: "",
     phone: "",
     status: "New", // Default status
+	priority: "Medium",
     notes: "",
   });
 
@@ -43,11 +44,12 @@ const LeadForm = ({ lead, onSuccess, onCancel }) => {
         email: lead.email || "",
         phone: lead.phone || "",
         status: lead.status || "New",
+		priority: lead.priority || "Medium",
         notes: lead.notes || "",
         id: lead.id || null, // Only present in Edit Mode
       });
     } else {
-      setFormData({ name: "", email: "", phone: "", status: "New", notes: "" });
+      setFormData({ name: "", email: "", phone: "", status: "New", priority: "Medium", notes: "" });
     }
   }, [lead]);
 
@@ -78,7 +80,7 @@ const LeadForm = ({ lead, onSuccess, onCancel }) => {
       .then(() => {
         alert(formData.id ? "Lead updated successfully!" : "Lead created successfully!");
         onSuccess(); // Notify parent to refresh the leads list
-        setFormData({ name: "", email: "", phone: "", status: "New", notes: "" }); // Reset form
+        setFormData({ name: "", email: "", phone: "", status: "New", priority: "Medium", notes: "" }); // Reset form
       })
       .catch((err) => {
         if (err.response && err.response.data) {
@@ -152,7 +154,22 @@ const LeadForm = ({ lead, onSuccess, onCancel }) => {
             <option value="Closed">Closed</option>
           </select>
         </div>
+		{/* Priority Dropdown */}
+		<div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Priority</label>
+          <select
+            name="priority"
+            value={formData.priority}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded"
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
 
+          </select>
+        </div>
+		
         {/* Notes Input */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Notes</label>
