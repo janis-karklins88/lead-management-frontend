@@ -2,11 +2,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { getLeads } from "../services/api";
 import { format } from "date-fns";
 import debounce from "lodash.debounce"; 
+import LeadDetails from "./LeadDetails";
 
 const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
   const [leads, setLeads] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedLead, setSelectedLead] = useState(null);
 
   // Sorting & Filtering state
   const [sortBy, setSortBy] = useState("createdAt");
@@ -32,7 +34,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
 
     getLeads(sortBy, order, filters)
       .then((response) => {
-        console.log("API Response:", response.data); // ✅ Log API response
+        console.log("API Response:", response.data); // Log API response
         setLeads(response.data);
       })
       .catch(() => setErrorMessage("Failed to load leads. Please try again later."))
@@ -45,7 +47,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
   const debouncedSearch = useCallback(
     debounce((value) => {
       setSearchName(value);
-    }, 800),
+    }, 800), //search delay when stopping typing
     [setSearchName]
   );
 
@@ -168,7 +170,7 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
             </tr>
           ) : (
             leads.map((lead) => {
-              console.log("Rendering lead:", lead); // ✅ Debugging log
+              console.log("Rendering lead:", lead); //debug log
               return (
                 <tr key={lead.id}>
                   
@@ -182,6 +184,13 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
                     {lead.createdAt ? format(new Date(lead.createdAt), "dd.MM.yyyy") : "—"}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
+				  {/* Buttons */}
+					<button
+                    onClick={() => setSelectedLead(lead)} //Open Lead Details
+                    className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 mr-2"
+                  >
+                    View Details
+                  </button>
                     <button
                       onClick={() => onEdit && onEdit(lead)}
                       className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
@@ -202,6 +211,14 @@ const LeadsTable = ({ onEdit, onDelete, reloadTable }) => {
           )}
         </tbody>
       </table>
+	  {/* Lead Details Modal */}
+      {selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96 relative">
+            <LeadDetails lead={selectedLead} onClose={() => setSelectedLead(null)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

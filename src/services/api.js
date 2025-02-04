@@ -20,6 +20,28 @@ const getAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+//activities
+// Get activities for a specific lead
+export const getActivities = (leadId) => {
+  return axios.get(`${API_URL}/activities/lead/${leadId}`, {
+    headers: getAuthHeader(),
+  });
+};
+
+//  Add a new activity to a lead
+export const addActivity = (leadId, activityData) => {
+  return axios.post(`${API_URL}/activities/lead/${leadId}`, activityData, {
+    headers: getAuthHeader(),
+  });
+};
+
+// Delete an activity
+export const deleteActivity = (activityId) => {
+  return axios.delete(`${API_URL}/activities/${activityId}`, {
+    headers: getAuthHeader(),
+  });
+};
+
 
 //get leads
 export const getLeads = (sortBy = "createdAt", order = "desc", filters = {}) => {
